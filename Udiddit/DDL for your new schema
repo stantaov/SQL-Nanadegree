@@ -1,0 +1,56 @@
+-- Create the DDL for your new schema
+
+CREATE​ ​TABLE​ ​"users"​ (
+​"id"​ ​SERIAL​ PRIMARY ​KEY​,
+​"username"​ ​VARCHAR​(​25​) ​UNIQUE​ ​NOT​ ​NULL​,
+  ​"last_login"​ ​TIMESTAMP );
+CREATE​ ​INDEX​ ​"username_index" ON​ ​"users"​ (​"username"​);
+CREATE​ ​TABLE​ ​"topics"​ (
+​"id"​ ​SERIAL​ PRIMARY ​KEY​,
+​"topic_name"​ ​VARCHAR​(​30​) ​UNIQUE​ ​NOT​ ​NULL​, ​"description"​ ​VARCHAR​(​500​)
+);
+CREATE​ ​INDEX​ ​"topic_index" ON​ ​"topics"​ (​"topic_name"​);
+CREATE​ ​TABLE​ ​"posts"​ (
+​"id"​ ​SERIAL​ PRIMARY ​KEY​,
+​"user_id"​ ​INT​,
+​"topic_id"​ ​INT​,
+​"post_title"​ ​VARCHAR​(​100​) ​NOT​ ​NULL​,
+​"url"​ ​VARCHAR​(​400​),
+​"post_content"​ ​VARCHAR​(​65000​),
+​"post _time"​ ​TIMESTAMP​,
+​"created _on"​ ​TIMESTAMP​,
+​CONSTRAINT​ ​"text_or_url"​ ​CHECK​ ((​"url"​ ​IS​ ​NOT​ ​NULL​ ​AND​ ​"post_content"
+IS​ ​NULL​ )
+​OR​ ( ​"url"​ ​IS​ ​NULL​ ​AND​ ​"post_content"​ ​IS​ ​NOT​ ​NULL​ )),
+​CONSTRAINT​ ​"user_id"​ FOREIGN ​KEY​ (​"user_id"​) ​REFERENCES​ ​"users"​ (​"id"​)
+ON​ ​DELETE​ ​SET​ ​NULL​,
+​CONSTRAINT​ ​"topic_id"​ FOREIGN ​KEY​ (​"topic_id"​) ​REFERENCES​ "​ topics"
+(​"id"​) ​ON​ ​DELETE​ ​CASCADE );
+CREATE​ ​INDEX​ ​"topic_id_index" ON​ ​"posts"​ (​"topic_id"​) ;
+CREATE​ ​TABLE​ ​"comments"​ (
+​"id"​ ​SERIAL​ PRIMARY ​KEY​,
+​"user_id"​ ​INT​,
+​"comment_text"​ ​VARCHAR​(​20000​) ​NOT​ ​NULL​,
+
+​"post_id"​ ​INT​,
+​"comment_id"​ ​INT​,
+​"comment_time"​ ​TIMESTAMP​,
+​CONSTRAINT​ ​"comment_id"​ FOREIGN ​KEY​ (​"comment_id"​) R​ EFERENCES
+"comments"​ (​"id"​) ​ON​ ​DELETE​ ​CASCADE​,
+​CONSTRAINT​ ​"user_id"​ FOREIGN ​KEY​ (​"user_id"​) ​REFERENCES​ ​"users"​ (​"id"​)
+ON​ ​DELETE​ ​SET​ ​NULL​,
+​CONSTRAINT​ ​"post_id"​ FOREIGN ​KEY​ (​"post_id"​) ​REFERENCES​ ​"posts"​ (​"id"​)
+ON​ ​DELETE​ ​CASCADE );
+CREATE​ ​TABLE​ ​"votes"​ (
+​"id"​ ​SERIAL​ PRIMARY ​KEY​,
+​"user_id"​ ​INT​,
+​"post_id"​ ​INT​,
+​"vote"​ ​SMALLINT​,
+​CONSTRAINT​ ​"vote"​ ​CHECK​ (​"vote"​ = ​1​ ​OR​
+​CONSTRAINT​ ​"user_id"​ FOREIGN ​KEY​ (​"user_id"​) ​REFERENCES​ ​"users"​ (​"id"​)
+ON​ ​DELETE​ ​SET​ ​NULL​,
+​CONSTRAINT​ ​"post_id"​ FOREIGN ​KEY​ (​"post_id"​) ​REFERENCES​ ​"posts"​ (​"id"​)
+ON​ ​DELETE​ ​CASCADE,
+​
+);
+CONSTRAINT "vote_check" UNIQUE ("user_id","post_id")
