@@ -1,0 +1,36 @@
+-- Migraing the provided data
+
+INSERT​ ​INTO​ ​"users"​ (​"username"​) SELECT​ ​DISTINCT​ ​"username"
+FROM​ bad_comments
+UNION
+SELECT​ ​DISTINCT​ FROM​ bad_posts UNION
+SELECT​ ​DISTINCT​ FROM​ bad_posts;
+REGEXP_SPLIT_TO_TABLE (upvotes, ​','​ ) ​AS​ usernames
+REGEXP_SPLIT_TO_TABLE (downvotes, ​','​ ) ​AS​ usernames
+
+INSERT​ ​INTO​ ​"topics"​ (​"topic_name"​) SELECT​ ​DISTINCT​ ​"topic"​ ​FROM​ ​"bad_posts"​;
+
+INSERT​ ​INTO​ ​"posts"​ (​"user_id"​, ​"post_title"​, ​"url"​, ​"post_content")​ SELECT​ u.id, ​LEFT​(b.title, ​100​), b.url, b.text_content
+FROM​ ​"bad_posts"​ ​AS​ b
+JOIN​ ​"users"​ ​AS​ u
+ON​ u.username = b.username;
+
+INSERT​ ​INTO​ ​"votes"​ (​"user_id"​, ​"post_id"​, ​"vote"​) SELECT​ u.id, up.id, ​1​ ​AS​ vote
+FROM​ (
+​SELECT​ ​"id"​, REGEXP_SPLIT_TO_TABLE(​"upvotes"​,​','​) ​AS​ username
+​FROM​ ​"bad_posts"​) ​AS​ up INNER​ ​JOIN​ ​"users"​ ​AS​ u
+ON​ up.username=u.username;
+
+INSERT​ ​INTO​ ​"votes"​ (​"user_id"​, ​"post_id"​, ​"vote"​) SELECT​ u.id, up.id, ​-1​ ​AS​ vote
+FROM​ (
+​SELECT​ ​"id"​, REGEXP_SPLIT_TO_TABLE(​"downvotes"​,​','​) ​AS​ username
+​FROM​ ​"bad_posts"​) ​AS​ up INNER​ ​JOIN​ ​"users"​ ​AS​ u
+ON​ up.username=u.username;
+
+
+INSERT​ ​INTO​ ​"comments"​ (​"post_id"​,​"user_id"​,​"comment_text"​) SELECT​ p.id, u.id, b.text_content
+FROM​ ​"bad_comments"​ ​AS​ b
+JOIN​ ​"posts"​ ​AS​ p
+ON​ b.post_id = p.id JOIN​ ​"users"​ ​AS​ u
+
+
